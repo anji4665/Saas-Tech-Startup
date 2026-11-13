@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stackly — Member Dashboard</title>
+<meta name="description" content="Your Stackly member workspace. Track projects, deployments, analytics and team activity in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --ink:#0A1120;
+    --ink-2:#0E1830;
+    --ink-3:#16223D;
+    --ink-4:#1C2A49;
+    --line: rgba(255,255,255,0.08);
+    --line-soft: rgba(255,255,255,0.05);
+    --accent:#6366F1;
+    --accent-dim: rgba(99,102,241,0.14);
+    --accent-2:#22D3EE;
+    --text:#EAF0FA;
+    --text-dim:#8DA0C4;
+    --text-faint:#5C6E8F;
+    --danger:#FF6B81;
+    --danger-dim: rgba(255,107,129,0.14);
+    --warn:#FFC24B;
+    --warn-dim: rgba(255,194,75,0.14);
+    --success:#4ADE80;
+    --success-dim: rgba(74,222,128,0.14);
+    --radius: 14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.font-display{font-family:'Sora',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  /* ===== APP SHELL ===== */
+  .app{ display:flex; min-height:100vh; }
+
+  /* ---- Sidebar ---- */
+  .sidebar{
+    width:240px; flex-shrink:0;
+    background: linear-gradient(180deg, var(--ink-2), var(--ink));
+    border-right:1px solid var(--line);
+    display:flex; flex-direction:column;
+    position:fixed; top:0; bottom:0; left:0; z-index:60;
+    transition: transform .3s ease;
+  }
+  .sb-top{ padding:22px 20px 18px; border-bottom:1px solid var(--line); }
+  .brand-logo{ display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; letter-spacing:-0.01em; }
+  .brand-logo-img{ height:34px; width:auto; display:block; object-fit:contain; }
+  .sb-tag{ font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin-top:6px; }
+
+  .sb-nav{ flex:1; padding:16px 12px; overflow-y:auto; }
+  .sb-section-label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); padding:10px 12px 6px; }
+  .nav-item{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    background:none; border:none; color:var(--text-dim);
+    padding:10px 12px; border-radius:9px; font-size:13.5px; cursor:pointer;
+    margin-bottom:2px; transition: background .18s ease, color .18s ease;
+  }
+  .nav-item i{ width:16px; text-align:center; font-size:14px; color:var(--text-faint); transition: color .18s ease; }
+  .nav-item:hover{ background:var(--ink-3); color:var(--text); }
+  .nav-item.active{ background:var(--accent-dim); color:var(--accent); font-weight:600; }
+  .nav-item.active i{ color:var(--accent); }
+  .nav-item .badge{
+    margin-left:auto; background:var(--danger); color:#fff; font-size:10.5px; font-weight:700;
+    padding:1px 6px; border-radius:999px; font-family:'JetBrains Mono',monospace;
+  }
+
+  .sb-bottom{ padding:14px 16px; border-top:1px solid var(--line); }
+  .sb-user{ display:flex; align-items:center; gap:10px; }
+  .sb-avatar{
+    width:36px; height:36px; border-radius:10px; flex-shrink:0;
+    background:linear-gradient(135deg, var(--accent-2), var(--accent));
+    display:flex; align-items:center; justify-content:center; color:var(--ink); font-weight:700; font-size:14px;
+  }
+  .sb-user-info{ min-width:0; }
+  .sb-user-name{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sb-user-dept{ font-size:11px; color:var(--text-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sb-logout{
+    margin-top:12px; width:100%; background:var(--ink-3); border:1px solid var(--line);
+    color:var(--text-dim); padding:9px; border-radius:9px; font-size:12.5px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px; transition: all .18s ease;
+  }
+  .sb-logout:hover{ color:var(--danger); border-color: rgba(255,107,129,0.35); background: var(--danger-dim); }
+
+  .sb-overlay{
+    display:none; position:fixed; inset:0; background:rgba(4,8,16,0.6); z-index:55;
+    backdrop-filter: blur(2px);
+  }
+
+  /* ---- Main ---- */
+  .main{ flex:1; margin-left:240px; min-width:0; display:flex; flex-direction:column; }
+
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background: rgba(10,17,32,0.85); backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:16px;
+    padding:14px 28px;
+  }
+  .hamburger{
+    display:none; background:var(--ink-3); border:1px solid var(--line); color:var(--text);
+    width:36px; height:36px; border-radius:9px; cursor:pointer; font-size:15px; flex-shrink:0;
+    align-items:center; justify-content:center;
+  }
+  .topbar-title{ font-size:15px; font-weight:700; margin-right:auto; }
+  .topbar-title .eyebrow-mini{ display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); font-weight:400; letter-spacing:.08em; text-transform:uppercase; margin-bottom:2px; }
+
+  .search-wrap{ position:relative; width:240px; }
+  .search-wrap input{
+    width:100%; background:var(--ink-3); border:1px solid var(--line); color:var(--text);
+    padding:9px 12px 9px 34px; border-radius:9px; font-size:13px; outline:none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .search-wrap input::placeholder{ color:var(--text-faint); }
+  .search-wrap input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
+  .search-wrap i{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-size:12.5px; }
+
+  .icon-btn{
+    background:var(--ink-3); border:1px solid var(--line); color:var(--text-dim);
+    width:36px; height:36px; border-radius:9px; cursor:pointer; font-size:14px; position:relative;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; transition: all .18s ease;
+  }
+  .icon-btn:hover{ color:var(--accent); border-color: rgba(99,102,241,0.3); }
+  .icon-btn .dot{ position:absolute; top:6px; right:7px; width:7px; height:7px; border-radius:50%; background:var(--danger); border:2px solid var(--ink-2); }
+
+  .content{ padding:28px; flex:1; }
+  .section{ display:none; }
+  .section.active{ display:block; animation: fadeUp .35s ease; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .page-head{ margin-bottom:22px; }
+  .page-head h1{ font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; }
+  .page-head p{ margin:0; color:var(--text-dim); font-size:13.5px; }
+
+  /* ---- Stat cards ---- */
+  .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card{
+    background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 16px; position:relative; overflow:hidden;
+  }
+  .stat-card .icon{
+    width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    background:var(--accent-dim); color:var(--accent); font-size:14px; margin-bottom:14px;
+  }
+  .stat-card .value{ font-family:'Sora',sans-serif; font-size:24px; font-weight:700; margin-bottom:3px; }
+  .stat-card .label{ font-size:12px; color:var(--text-dim); }
+  .stat-card .delta{ font-family:'JetBrains Mono',monospace; font-size:11px; margin-top:8px; display:inline-flex; align-items:center; gap:4px; }
+  .stat-card .delta.up{ color:var(--success); }
+  .stat-card .delta.down{ color:var(--danger); }
+
+  /* ---- Grid layout for overview ---- */
+  .grid-2{ display:grid; grid-template-columns: 1.6fr 1fr; gap:18px; align-items:start; }
+
+  .panel{
+    background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:16px 18px; border-bottom:1px solid var(--line);
+  }
+  .panel-head h3{ margin:0; font-size:14.5px; font-weight:600; }
+  .panel-head .sub{ font-size:11.5px; color:var(--text-faint); margin-left:auto; font-family:'JetBrains Mono',monospace; }
+  .panel-body{ padding:6px 0; }
+  .panel-body.pad{ padding:16px 18px; }
+
+  /* ---- Table ---- */
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--text-faint); font-weight:500;
+    padding:10px 18px; border-bottom:1px solid var(--line);
+  }
+  tbody td{ padding:12px 18px; font-size:13px; border-bottom:1px solid var(--line-soft); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr{ transition: background .15s ease; }
+  tbody tr:hover{ background: rgba(255,255,255,0.02); }
+  .cell-main{ font-weight:600; }
+  .cell-sub{ font-size:11.5px; color:var(--text-faint); margin-top:2px; }
+
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
+    font-size:11px; font-weight:600; font-family:'JetBrains Mono',monospace;
+  }
+  .status-pill .dot{ width:6px; height:6px; border-radius:50%; }
+  .status-pill.ok{ background:var(--success-dim); color:var(--success); }
+  .status-pill.ok .dot{ background:var(--success); }
+  .status-pill.run{ background:var(--accent-dim); color:var(--accent); }
+  .status-pill.run .dot{ background:var(--accent); animation: blink 1.4s infinite; }
+  .status-pill.fail{ background:var(--danger-dim); color:var(--danger); }
+  .status-pill.fail .dot{ background:var(--danger); }
+  .status-pill.wait{ background:var(--warn-dim); color:var(--warn); }
+  .status-pill.wait .dot{ background:var(--warn); }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+  /* ---- Workspace health stack ---- */
+  .health-stack{ padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .health-row{
+    display:flex; align-items:center; gap:12px; background:var(--ink-3); border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px;
+  }
+  .health-row .stage-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .health-row.ok .stage-dot{ background:var(--success); box-shadow:0 0 8px var(--success); }
+  .health-row.warn .stage-dot{ background:var(--warn); box-shadow:0 0 8px var(--warn); }
+  .health-row .stage-name{ font-size:12.5px; font-weight:600; }
+  .health-row .stage-meta{ margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); }
+
+  /* ---- Alerts ---- */
+  .alert-item{ display:flex; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line-soft); }
+  .alert-item:last-child{ border-bottom:none; }
+  .alert-icon{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; }
+  .alert-icon.warn{ background:var(--warn-dim); color:var(--warn); }
+  .alert-icon.fail{ background:var(--danger-dim); color:var(--danger); }
+  .alert-icon.info{ background:var(--accent-dim); color:var(--accent); }
+  .alert-title{ font-size:13px; font-weight:600; margin-bottom:2px; }
+  .alert-desc{ font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .alert-time{ font-size:11px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; margin-top:4px; }
+
+  /* ---- Filter tabs ---- */
+  .tab-row{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab-chip{
+    background:var(--ink-3); border:1px solid var(--line); color:var(--text-dim);
+    padding:7px 14px; border-radius:999px; font-size:12.5px; cursor:pointer; transition: all .18s ease;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .tab-chip.active{ background:var(--accent-dim); color:var(--accent); border-color: rgba(99,102,241,0.35); }
+
+  /* ---- Settings form ---- */
+  .settings-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:640px; }
+  .field{ margin-bottom:2px; }
+  .field label{ display:block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:7px; }
+  .field input, .field select{
+    width:100%; background:var(--ink-3); border:1px solid var(--line); color:var(--text); font-size:14px;
+    padding:11px 13px; border-radius:9px; outline:none; transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .field input:focus, .field select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
+  .btn-primary{
+    border:none; border-radius:10px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: var(--ink); font-weight:700; font-size:13.5px; padding:11px 20px; cursor:pointer;
+    font-family:'Sora',sans-serif; margin-top:6px; transition: transform .15s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); }
+  .btn-secondary{
+    border:1px solid var(--line); border-radius:10px; background:var(--ink-3); color:var(--text-dim);
+    font-size:13.5px; padding:11px 20px; cursor:pointer; margin-top:6px; transition: all .15s ease;
+  }
+  .btn-secondary:hover{ color:var(--text); border-color:var(--line-soft); }
+
+  /* ---- Plan card ---- */
+  .plan-card{
+    display:flex; align-items:center; gap:16px; padding:18px; background:var(--ink-3); border:1px solid var(--line);
+    border-radius:12px; margin-bottom:16px;
+  }
+  .plan-icon{ width:44px; height:44px; border-radius:12px; background:var(--accent-dim); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .plan-info{ flex:1; }
+  .plan-name{ font-weight:700; font-size:15px; }
+  .plan-detail{ font-size:12px; color:var(--text-dim); margin-top:3px; }
+  .plan-price{ font-family:'Sora',sans-serif; font-weight:700; font-size:18px; }
+  .plan-period{ font-size:12px; color:var(--text-faint); display:block; }
+
+  /* ---- Usage bar ---- */
+  .usage-bar{ height:8px; background:var(--ink-4); border-radius:999px; overflow:hidden; margin-top:10px; }
+  .usage-fill{ height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius:999px; }
+
+  /* ---- Toast ---- */
+  .toast{
+    position:fixed; top:22px; right:22px; z-index:10000; min-width:280px; max-width:340px;
+    background: var(--ink-3); border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+    display:flex; gap:12px; align-items:flex-start; box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+    transform: translateX(120%); opacity:0; transition: transform .35s ease, opacity .35s ease;
+  }
+  .toast.show{ transform: translateX(0); opacity:1; }
+  .toast .icon{ font-size:17px; margin-top:1px; }
+  .toast .title{ font-weight:700; font-size:13.5px; margin-bottom:2px; font-family:'Sora',sans-serif; }
+  .toast .msg{ font-size:12.5px; color:var(--text-dim); line-height:1.4; }
+  .toast.success{ border-color: rgba(74,222,128,0.35); }
+  .toast.error{ border-color: rgba(255,107,129,0.35); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1080px){
+    .grid-2{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 900px){
+    .stat-grid{ grid-template-columns:repeat(2,1fr); }
+    .search-wrap{ display:none; }
+  }
+  @media (max-width: 840px){
+    .sidebar{ transform: translateX(-100%); }
+    .sidebar.open{ transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.4); }
+    .sb-overlay.show{ display:block; }
+    .main{ margin-left:0; }
+    .hamburger{ display:flex; }
+    .topbar{ padding:12px 16px; }
+    .content{ padding:18px 16px 32px; }
+  }
+  @media (max-width: 560px){
+    .stat-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-card{ padding:14px 14px 12px; }
+    .stat-card .value{ font-size:20px; }
+    .settings-grid{ grid-template-columns:1fr; }
+    .topbar-title{ font-size:13.5px; }
+    thead{ display:none; }
+    table, tbody, tr, td{ display:block; width:100%; }
+    tbody tr{ border-bottom:1px solid var(--line); padding:12px 18px; }
+    tbody td{ border:none; padding:4px 0; display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    tbody td::before{ content: attr(data-label); font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; }
+    tbody td.cell-name-cell::before{ display:none; }
+    .plan-card{ flex-wrap:wrap; }
+    .toast{ left:14px; right:14px; top:14px; min-width:0; max-width:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="brand-logo"><img src="./images/Stackly_logo.webp" alt="Stackly" class="brand-logo-img"></div>
+      <div class="sb-tag">Member dashboard</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section-label">Workspace</div>
+      <button class="nav-item active" data-section="overview" onclick="switchSection('overview', this)"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+      <button class="nav-item" data-section="projects" onclick="switchSection('projects', this)"><i class="fa-solid fa-folder-tree"></i> Projects</button>
+      <button class="nav-item" data-section="deployments" onclick="switchSection('deployments', this)"><i class="fa-solid fa-rocket"></i> Deployments</button>
+      <button class="nav-item" data-section="alerts" onclick="switchSection('alerts', this)"><i class="fa-solid fa-triangle-exclamation"></i> Alerts</button>
+
+      <div class="sb-section-label">Account</div>
+      <button class="nav-item" data-section="settings" onclick="switchSection('settings', this)"><i class="fa-solid fa-gear"></i> Settings</button>
+      <button class="nav-item" data-section="billing" onclick="switchSection('billing', this)"><i class="fa-solid fa-credit-card"></i> Plan &amp; Billing</button>
+    </nav>
+
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">M</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sbUserName">Account owner</div>
+          <div class="sb-user-dept" id="sbUserDept">No email on file</div>
+        </div>
+      </div>
+      <button class="sb-logout" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-title">
+        <span class="eyebrow-mini">Member dashboard</span>
+        <span id="topbarTitle">Overview</span>
+      </div>
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="globalSearch" placeholder="Search projects, deployments...">
+      </div>
+      <button class="icon-btn" title="Alerts" onclick="switchSection('alerts', document.querySelector('[data-section=alerts]'))"><i class="fa-regular fa-bell"></i><span class="dot"></span></button>
+      <button class="icon-btn" title="Settings" onclick="switchSection('settings', document.querySelector('[data-section=settings]'))"><i class="fa-solid fa-gear"></i></button>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== OVERVIEW ===== -->
+      <section class="section active" id="section-overview">
+        <div class="page-head">
+          <h1 id="greeting">Welcome back</h1>
+          <p>Here's what's happening across your Stackly workspace.</p>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="icon"><i class="fa-solid fa-folder-open"></i></div>
+            <div class="value">18</div>
+            <div class="label">Active projects</div>
+            <div class="delta up"><i class="fa-solid fa-arrow-up"></i> 3 created this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon"><i class="fa-solid fa-list-check"></i></div>
+            <div class="value">42</div>
+            <div class="label">Tasks in progress</div>
+            <div class="delta up"><i class="fa-solid fa-check"></i> 8 completed today</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="value">2.4M</div>
+            <div class="label">API requests (30d)</div>
+            <div class="delta up"><i class="fa-solid fa-arrow-up"></i> 12.5% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon"><i class="fa-solid fa-users"></i></div>
+            <div class="value">24</div>
+            <div class="label">Team members</div>
+            <div class="delta up"><i class="fa-solid fa-user-plus"></i> 2 invites pending</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recent deployments</h3>
+              <span class="sub">Live</span>
+            </div>
+            <div class="panel-body">
+              <table>
+                <thead>
+                  <tr><th>Project</th><th>Env</th><th>Status</th><th>Completed</th></tr>
+                </thead>
+                <tbody id="recentDeploymentsTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Workspace health</h3>
+              <span class="sub">Your environment</span>
+            </div>
+            <div class="health-stack">
+              <div class="health-row ok"><span class="stage-dot"></span><span class="stage-name">API gateway</span><span class="stage-meta">42ms avg</span></div>
+              <div class="health-row ok"><span class="stage-dot"></span><span class="stage-name">Webhooks</span><span class="stage-meta">99.98% delivered</span></div>
+              <div class="health-row ok"><span class="stage-dot"></span><span class="stage-name">Background jobs</span><span class="stage-meta">3 workers active</span></div>
+              <div class="health-row warn"><span class="stage-dot"></span><span class="stage-name">Analytics sync</span><span class="stage-meta">1 retry queued</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PROJECTS ===== -->
+      <section class="section" id="section-projects">
+        <div class="page-head">
+          <h1>Projects</h1>
+          <p>Every project your team is building in this workspace.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-body">
+            <table>
+              <thead><tr><th>Project</th><th>Members</th><th>Open tasks</th><th>Last activity</th></tr></thead>
+              <tbody id="projectsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DEPLOYMENTS ===== -->
+      <section class="section" id="section-deployments">
+        <div class="page-head">
+          <h1>Deployments</h1>
+          <p>Every build and release across your projects.</p>
+        </div>
+        <div class="tab-row">
+          <button class="tab-chip active" data-filter="all" onclick="filterDeployments('all', this)">All</button>
+          <button class="tab-chip" data-filter="ok" onclick="filterDeployments('ok', this)">Deployed</button>
+          <button class="tab-chip" data-filter="run" onclick="filterDeployments('run', this)">Building</button>
+          <button class="tab-chip" data-filter="fail" onclick="filterDeployments('fail', this)">Failed</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body">
+            <table>
+              <thead><tr><th>Project</th><th>Env</th><th>Status</th><th>Completed</th></tr></thead>
+              <tbody id="deploymentsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ALERTS ===== -->
+      <section class="section" id="section-alerts">
+        <div class="page-head">
+          <h1>Alerts</h1>
+          <p>Events and notifications from your Stackly workspace.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-body" id="alertsList"></div>
+        </div>
+      </section>
+
+      <!-- ===== SETTINGS ===== -->
+      <section class="section" id="section-settings">
+        <div class="page-head">
+          <h1>Settings</h1>
+          <p>Manage your profile and notification preferences.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-body pad">
+            <div class="settings-grid">
+              <div class="field">
+                <label>Full name</label>
+                <input type="text" id="settingsName" placeholder="Jordan Blake">
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" id="settingsEmail" placeholder="you@company.com" disabled>
+              </div>
+              <div class="field">
+                <label>Company</label>
+                <input type="text" id="settingsCompany" placeholder="Acme Inc.">
+              </div>
+              <div class="field">
+                <label>Notification email</label>
+                <input type="email" id="settingsNotifyEmail" placeholder="alerts@company.com" disabled>
+              </div>
+              <div class="field" style="grid-column: span 2;">
+                <label>Change password</label>
+                <div style="display:flex; gap:10px;">
+                  <input type="password" id="settingsPassword" placeholder="New password" style="flex:1;">
+                  <button class="btn-secondary" onclick="changePassword()">Update</button>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveSettings()">Save changes</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PLAN & BILLING ===== -->
+      <section class="section" id="section-billing">
+        <div class="page-head">
+          <h1>Plan &amp; Billing</h1>
+          <p>Your current plan and seat usage.</p>
+        </div>
+        <div class="plan-card">
+          <div class="plan-icon"><i class="fa-solid fa-crown"></i></div>
+          <div class="plan-info">
+            <div class="plan-name" id="planName">Growth Plan</div>
+            <div class="plan-detail">30 seats · Unlimited projects · Advanced analytics</div>
+            <div class="usage-bar"><div class="usage-fill" style="width:80%;"></div></div>
+            <div class="plan-detail" style="margin-top:6px;" id="planUsageDetail">24 of 30 seats used</div>
+          </div>
+          <div class="plan-price">
+            $49<span class="plan-period">/month</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-primary" onclick="showToast('success','Upgrade request sent','Our team will contact you to discuss an upgrade.')">Upgrade plan</button>
+          <button class="btn-secondary" onclick="showToast('info','Invoice history','Viewing invoices is not available in this demo.')">View invoices</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="icon" id="toastIconEl">✅</span>
+  <div>
+    <div class="title" id="toastTitle">Title</div>
+    <div class="msg" id="toastMsg">Message</div>
+  </div>
+</div>
+
+<script>
+  // ===== CONFIG =====
+  const LOGIN_PAGE_URL = 'login.html'; // change if your sign-in page lives elsewhere
+
+  // ===== SAMPLE DATA =====
+  const deploymentsData = [
+    { project:'web-app',         branch:'main',            env:'Production', status:'ok',   completed:'2 min ago'  },
+    { project:'api-gateway',     branch:'main',            env:'Production', status:'run',  completed:'building'   },
+    { project:'marketing-site',  branch:'staging',         env:'Staging',    status:'ok',   completed:'11 min ago' },
+    { project:'billing-service', branch:'main',            env:'Production', status:'fail', completed:'18 min ago' },
+    { project:'data-pipeline',   branch:'feature/etl-v2',  env:'Staging',    status:'run',  completed:'building'   },
+    { project:'mobile-api',      branch:'main',            env:'Production', status:'ok',   completed:'34 min ago' },
+    { project:'docs-portal',     branch:'preview',         env:'Preview',    status:'wait', completed:'queued'     },
+    { project:'analytics-worker',branch:'main',            env:'Production', status:'ok',   completed:'1 hr ago'   },
+  ];
+
+  const projectsData = [
+    { name:'acme/web-app',        stack:'Next.js · TypeScript', members:'8 members', tasks:'24 open', modified:'2 min ago'  },
+    { name:'acme/api-gateway',    stack:'Go · gRPC',            members:'5 members', tasks:'12 open', modified:'18 min ago' },
+    { name:'acme/marketing-site', stack:'Astro · MDX',          members:'3 members', tasks:'9 open',  modified:'1 hr ago'   },
+    { name:'acme/billing-service',stack:'Node · Postgres',      members:'6 members', tasks:'17 open', modified:'2 hr ago'   },
+    { name:'acme/data-pipeline',  stack:'Python · Airflow',     members:'4 members', tasks:'6 open',  modified:'3 hr ago'   },
+  ];
+
+  const alertsData = [
+    { type:'fail', title:'Deployment failed — billing-service', desc:'Build step "migrate-check" failed after 2 retries. The service was rolled back to its last stable release.', time:'18 min ago' },
+    { type:'warn', title:'API rate limit at 82%', desc:'Your workspace has used 82% of its monthly request quota. Upgrade before the next billing cycle to avoid throttling.', time:'22 min ago' },
+    { type:'warn', title:'Seat usage at 80%', desc:'24 of 30 seats are in use. You can manage seats from Plan & Billing.', time:'2 days ago' },
+    { type:'info', title:'Weekly analytics digest is ready', desc:'Signups are up 12.4% week-over-week and retention held at 94%. Open Projects for the full breakdown.', time:'1 day ago' },
+  ];
+
+  function statusLabel(s){
+    return { ok:'Deployed', run:'Building', fail:'Failed', wait:'Queued' }[s] || s;
+  }
+
+  function renderDeploymentRow(d){
+    return `<tr data-status="${d.status}">
+      <td data-label="Project" class="cell-name-cell"><div class="cell-main">${d.project}</div><div class="cell-sub mono">${d.branch}</div></td>
+      <td data-label="Env"><span class="mono" style="font-size:11.5px; color:var(--text-dim);">${d.env}</span></td>
+      <td data-label="Status"><span class="status-pill ${d.status}"><span class="dot"></span>${statusLabel(d.status)}</span></td>
+      <td data-label="Completed" class="mono" style="color:var(--text-dim); font-size:12px;">${d.completed}</td>
+    </tr>`;
+  }
+
+  function renderProjectRow(p){
+    return `<tr>
+      <td data-label="Project" class="cell-name-cell"><div class="cell-main mono" style="font-size:12.5px;">${p.name}</div><div class="cell-sub">${p.stack}</div></td>
+      <td data-label="Members">${p.members}</td>
+      <td data-label="Open tasks">${p.tasks}</td>
+      <td data-label="Last activity" class="mono" style="color:var(--text-dim); font-size:12px;">${p.modified}</td>
+    </tr>`;
+  }
+
+  function renderAlerts(){
+    const list = document.getElementById('alertsList');
+    const iconMap = { fail:'fa-solid fa-circle-xmark', warn:'fa-solid fa-triangle-exclamation', info:'fa-solid fa-circle-info' };
+    list.innerHTML = alertsData.map(a => `
+      <div class="alert-item">
+        <div class="alert-icon ${a.type}"><i class="${iconMap[a.type]}"></i></div>
+        <div>
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-desc">${a.desc}</div>
+          <div class="alert-time">${a.time}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderAll(){
+    document.getElementById('recentDeploymentsTable').innerHTML = deploymentsData.slice(0,5).map(renderDeploymentRow).join('');
+    document.getElementById('deploymentsTable').innerHTML = deploymentsData.map(renderDeploymentRow).join('');
+    document.getElementById('projectsTable').innerHTML = projectsData.map(renderProjectRow).join('');
+    renderAlerts();
+  }
+
+  function filterDeployments(status, btn){
+    document.querySelectorAll('.tab-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const rows = document.querySelectorAll('#deploymentsTable tr');
+    rows.forEach(r => {
+      r.style.display = (status === 'all' || r.dataset.status === status) ? '' : 'none';
+    });
+  }
+
+  // ===== NAVIGATION =====
+  function switchSection(name, btn){
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const titles = { overview:'Overview', projects:'Projects', deployments:'Deployments', alerts:'Alerts', settings:'Settings', billing:'Plan & Billing' };
+    document.getElementById('topbarTitle').textContent = titles[name] || name;
+    closeSidebar();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function openSidebar(){
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sbOverlay').classList.add('show');
+  }
+  function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sbOverlay').classList.remove('show');
+  }
+
+  // ===== SEARCH =====
+  document.getElementById('globalSearch').addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    document.querySelectorAll('#deploymentsTable tr, #projectsTable tr, #recentDeploymentsTable tr').forEach(r => {
+      r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  // ===== SETTINGS =====
+  function saveSettings(){
+    const name = document.getElementById('settingsName').value.trim();
+    if (name){
+      localStorage.setItem('loggedInUserName', name);
+      applyUserInfo();
+    }
+    const company = document.getElementById('settingsCompany').value.trim();
+    if (company) localStorage.setItem('clientCompany', company);
+    showToast('success', 'Settings saved', 'Your profile has been updated.');
+  }
+
+  function changePassword(){
+    const newPass = document.getElementById('settingsPassword').value;
+    if (newPass.length < 8){
+      showToast('error', 'Password too short', 'Please use at least 8 characters.');
+      return;
+    }
+    document.getElementById('settingsPassword').value = '';
+    showToast('success', 'Password updated', 'Your password has been changed successfully.');
+  }
+
+  // ===== TOAST =====
+  const toastEl = document.getElementById('toast');
+  const toastIconEl = document.getElementById('toastIconEl');
+  const toastTitle = document.getElementById('toastTitle');
+  const toastMsg = document.getElementById('toastMsg');
+  let toastTimer;
+  function showToast(type, title, msg){
+    clearTimeout(toastTimer);
+    toastEl.className = 'toast ' + type;
+    toastIconEl.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    toastTitle.textContent = title;
+    toastMsg.textContent = msg;
+    requestAnimationFrame(() => toastEl.classList.add('show'));
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3200);
+  }
+
+  // ===== LOGOUT =====
+  function handleLogout(){
+    ['loggedInUserEmail','loggedInUserName','userRole','loginMethod','loggedInDept','loggedInTeam',
+     'stacklyUserEmail','stacklyUserName','stacklyStaffRole','loginTimestamp',
+     'clientCompany','clientNotifyEmail'
+    ].forEach(k => localStorage.removeItem(k));
+    showToast('success', 'Signed out', 'Redirecting to the sign-in page...');
+    setTimeout(() => window.location.href = LOGIN_PAGE_URL, 1000);
+  }
+
+  // ===== USER INFO FROM LOGIN =====
+  function applyUserInfo(){
+    const nameRaw = localStorage.getItem('loggedInUserName') || 'Account owner';
+    const name = nameRaw.replace(/[^A-Za-z\s]/g, '').trim() || 'Account owner';
+    const email = localStorage.getItem('loggedInUserEmail') || '';
+    const company = localStorage.getItem('clientCompany') || '';
+
+    document.getElementById('sbUserName').textContent = name;
+    document.getElementById('sbUserDept').textContent = email || 'No email on file';
+    document.getElementById('sbAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'M';
+
+    const firstName = (name === 'Account owner') ? '' : name.split(' ')[0];
+    document.getElementById('greeting').textContent = firstName ? `Welcome back, ${firstName}` : 'Welcome back';
+
+    document.getElementById('settingsName').value = name;
+    document.getElementById('settingsEmail').value = email;
+    document.getElementById('settingsCompany').value = company;
+    document.getElementById('settingsNotifyEmail').value = email;
+  }
+
+  // ===== RESTRICT FULL NAME FIELD TO ALPHABETS ONLY =====
+  document.getElementById('settingsName').addEventListener('input', function(){
+    this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+  });
+
+  // ===== RESTRICT COMPANY FIELD TO ALPHABETS ONLY =====
+  document.getElementById('settingsCompany').addEventListener('input', function(){
+    this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+  });
+
+  // ===== INIT =====
+  document.addEventListener('DOMContentLoaded', () => {
+    applyUserInfo();
+    renderAll();
+  });
+</script>
+</body>
+</html>

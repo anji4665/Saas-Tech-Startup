@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 – Page Not Found</title>
+  <style>
+    :root {
+      /* fresh light blue palette */
+      --blue-primary: #42A5F5;
+      --blue-light: #BBDEFB;
+      --blue-dark: #1565C0;
+      --blue-glow: #90CAF9;
+      --bg-soft: #F0F9FF;      /* soft sky parchment */
+      --text-main: #1E3A5F;
+      --text-soft: #0F2744;
+      --border-soft: #B8D4E8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-soft);
+      overflow: hidden;
+      position: relative;
+      cursor: default;
+      color: var(--text-main);
+    }
+
+    /* ============ ANIMATED BACKGROUND – FRESH BLUE SKY THEME ============ */
+    .background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* soft light blue orbs (like glowing cloud puffs) */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #E3F2FD, #90CAF9, #42A5F5);
+      opacity: 0.3;
+      filter: blur(60px);
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+
+    .orb:nth-child(1) {
+      width: 420px; height: 420px; top: -100px; left: -100px;
+      animation-delay: 0s; animation-duration: 14s;
+      background: radial-gradient(circle at 30% 30%, #E0F2FE, #7DD3FC, #3B82F6);
+    }
+    .orb:nth-child(2) {
+      width: 320px; height: 320px; bottom: -60px; right: -60px;
+      animation-delay: -2s; animation-duration: 16s;
+      background: radial-gradient(circle at 30% 30%, #E0F7FA, #67E8F9, #0284C7);
+      opacity: 0.25;
+    }
+    .orb:nth-child(3) {
+      width: 280px; height: 280px; top: 55%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -4s; animation-duration: 13s;
+      background: radial-gradient(circle at 30% 30%, #E1F5FE, #4FC3F7, #0369A1);
+      opacity: 0.2;
+    }
+    .orb:nth-child(4) {
+      width: 220px; height: 220px; top: 18%; right: 12%;
+      animation-delay: -6s; animation-duration: 15s;
+      background: radial-gradient(circle at 30% 30%, #DBEAFE, #93C5FD, #2563EB);
+      opacity: 0.35;
+    }
+    .orb:nth-child(5) {
+      width: 170px; height: 170px; bottom: 20%; left: 8%;
+      animation-delay: -3s; animation-duration: 11s;
+      background: radial-gradient(circle at 30% 30%, #E0F2FE, #60A5FA, #1D4ED8);
+      opacity: 0.4;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(55px, -35px) scale(1.12); }
+      50% { transform: translate(-25px, 45px) scale(0.96); }
+      75% { transform: translate(35px, 25px) scale(1.06); }
+    }
+
+    /* fresh blue rays – like sunlight through clouds */
+    .light-ray {
+      position: absolute;
+      width: 2px;
+      height: 40%;
+      background: linear-gradient(to bottom, rgba(96, 165, 250, 0.7), transparent);
+      animation: rayPulse 5.5s ease-in-out infinite;
+      opacity: 0;
+      transform-origin: top center;
+    }
+    .light-ray:nth-child(6) { left: 5%; top: 10%; animation-delay: 0s; height: 52%; transform: rotate(15deg); }
+    .light-ray:nth-child(7) { left: 20%; top: 5%; animation-delay: 1s; height: 38%; transform: rotate(25deg); }
+    .light-ray:nth-child(8) { left: 40%; top: 0%; animation-delay: 2s; height: 48%; transform: rotate(5deg); }
+    .light-ray:nth-child(9) { right: 25%; top: 8%; animation-delay: 0.5s; height: 42%; transform: rotate(-10deg); }
+    .light-ray:nth-child(10) { right: 8%; top: 5%; animation-delay: 1.5s; height: 52%; transform: rotate(-20deg); }
+    .light-ray:nth-child(11) { left: 55%; top: 3%; animation-delay: 2.5s; height: 34%; transform: rotate(12deg); }
+    .light-ray:nth-child(12) { left: 70%; top: 0%; animation-delay: 3s; height: 46%; transform: rotate(-8deg); }
+
+    @keyframes rayPulse {
+      0%, 100% { opacity: 0; transform: rotate(var(--ray-angle, 0deg)) scaleY(0.3); }
+      50% { opacity: 0.8; transform: rotate(var(--ray-angle, 0deg)) scaleY(1); }
+    }
+
+    /* blue pollen / droplet particles */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--blue-primary);
+      animation: particleFloat 7s ease-in-out infinite;
+      opacity: 0;
+    }
+    .particle:nth-child(13) { width: 6px; height: 6px; left: 15%; top: 30%; animation-delay: 0s; box-shadow: 0 0 12px 3px rgba(96, 165, 250, 0.8); }
+    .particle:nth-child(14) { width: 4px; height: 4px; left: 35%; top: 60%; animation-delay: 1.2s; box-shadow: 0 0 10px 2px rgba(125, 211, 252, 0.7); }
+    .particle:nth-child(15) { width: 8px; height: 8px; left: 55%; top: 25%; animation-delay: 2s; box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.9); }
+    .particle:nth-child(16) { width: 5px; height: 5px; left: 75%; top: 55%; animation-delay: 0.8s; box-shadow: 0 0 12px 3px rgba(96, 165, 250, 0.8); }
+    .particle:nth-child(17) { width: 3px; height: 3px; left: 25%; top: 80%; animation-delay: 2.8s; box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.6); }
+    .particle:nth-child(18) { width: 7px; height: 7px; left: 85%; top: 15%; animation-delay: 1.6s; box-shadow: 0 0 14px 3px rgba(125, 211, 252, 0.8); }
+    .particle:nth-child(19) { width: 5px; height: 5px; left: 45%; top: 75%; animation-delay: 3.2s; box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.7); }
+    .particle:nth-child(20) { width: 6px; height: 6px; left: 65%; top: 40%; animation-delay: 0.4s; box-shadow: 0 0 13px 3px rgba(96, 165, 250, 0.8); }
+
+    @keyframes particleFloat {
+      0%, 100% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+      20% { opacity: 0.9; transform: translate(20px, -40px) scale(1.3); }
+      50% { opacity: 0.6; transform: translate(-10px, -70px) scale(0.8); }
+      70% { opacity: 0.3; transform: translate(15px, -95px) scale(0.6); }
+      90% { opacity: 0.05; transform: translate(5px, -115px) scale(0.3); }
+    }
+
+    /* geometric shapes – cloud / raindrop motifs in blue */
+    .bg-shape {
+      position: absolute;
+      border: 2px solid rgba(59, 130, 246, 0.5);
+      animation: shapeFloat 12s ease-in-out infinite;
+      opacity: 0.6;
+    }
+    .bg-shape.shape-triangle {
+      width: 0; height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid rgba(59, 130, 246, 0.45);
+      border-top: none;
+      top: 22%; left: 10%;
+      animation-delay: 0s;
+    }
+    .bg-shape.shape-square {
+      width: 25px; height: 25px;
+      background: transparent;
+      top: 70%; right: 15%;
+      animation-delay: -3s;
+      transform: rotate(45deg);
+      border-radius: 5px;
+      border-color: rgba(125, 211, 252, 0.65);
+    }
+    .bg-shape.shape-circle {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.25);
+      top: 38%; left: 28%;
+      animation-delay: -6s;
+      border: none;
+    }
+    .bg-shape.shape-diamond {
+      width: 20px; height: 20px;
+      background: transparent;
+      transform: rotate(45deg);
+      top: 80%; left: 50%;
+      animation-delay: -9s;
+      border: 2px solid rgba(125, 211, 252, 0.6);
+      border-radius: 4px;
+    }
+
+    @keyframes shapeFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      25% { transform: translate(35px, -55px) rotate(90deg) scale(1.1); }
+      50% { transform: translate(-25px, -75px) rotate(180deg) scale(0.9); }
+      75% { transform: translate(30px, -25px) rotate(270deg) scale(1.05); }
+    }
+
+    /* blue shooting stars – falling droplets */
+    .shooting-star {
+      position: absolute;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(to right, rgba(96, 165, 250, 0), rgba(96, 165, 250, 1), rgba(96, 165, 250, 0));
+      animation: shoot 7s ease-in-out infinite;
+      opacity: 0;
+      transform: rotate(-35deg);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px rgba(125, 211, 252, 1));
+    }
+    .shooting-star:nth-child(24) {
+      top: 12%; left: -10%;
+      animation-delay: 0s; animation-duration: 7.5s;
+    }
+    .shooting-star:nth-child(25) {
+      top: 42%; left: -10%;
+      animation-delay: 2.5s; animation-duration: 8s;
+      width: 70px;
+      background: linear-gradient(to right, rgba(96, 165, 250, 0), rgba(96, 165, 250, 1), rgba(96, 165, 250, 0));
+    }
+    .shooting-star:nth-child(26) {
+      top: 65%; left: -10%;
+      animation-delay: 4.2s; animation-duration: 6.8s;
+      width: 90px;
+      background: linear-gradient(to right, rgba(125, 211, 252, 0), rgba(125, 211, 252, 1), rgba(125, 211, 252, 0));
+    }
+
+    @keyframes shoot {
+      0% { opacity: 0; transform: translate(0, 0) rotate(-35deg); }
+      5% { opacity: 1; }
+      20% { opacity: 0; transform: translate(60vw, 35vw) rotate(-35deg); }
+      100% { opacity: 0; transform: translate(60vw, 35vw) rotate(-35deg); }
+    }
+
+    /* subtle field grid (light blue) */
+    .grid-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+      background-size: 55px 55px;
+      animation: gridMove 22s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(12px, -12px); }
+      50% { transform: translate(0, -28px); }
+      75% { transform: translate(-12px, -12px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* ============ MAIN CONTENT ============ */
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 30px;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    .error-code {
+      font-size: clamp(120px, 20vw, 200px);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #DBEAFE 0%, #93C5FD 30%, #60A5FA 50%, #3B82F6 75%, #1D4ED8 100%);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 4s ease-in-out infinite;
+      letter-spacing: -8px;
+      user-select: none;
+      position: relative;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .error-glow {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(96, 165, 250, 0.45) 0%, transparent 70%);
+      filter: blur(45px);
+      animation: glowPulse 3.2s ease-in-out infinite;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    .error-message {
+      font-size: clamp(18px, 3vw, 28px);
+      color: #1E3A5F;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 0 18px rgba(96, 165, 250, 0.7);
+    }
+
+    .error-description {
+      font-size: clamp(14px, 2vw, 18px);
+      color: #2E5077;
+      margin-bottom: 35px;
+      line-height: 1.6;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      white-space: nowrap;
+      background: transparent;
+    }
+
+    .btn svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    /* back button – outline light blue */
+    .btn-back {
+      color: #2563EB;
+      border: 2.5px solid #60A5FA;
+      box-shadow: 0 0 20px rgba(96, 165, 250, 0.25), inset 0 0 15px rgba(96, 165, 250, 0.1);
+      background: rgba(240, 249, 255, 0.4);
+    }
+    .btn-back:hover {
+      background: rgba(96, 165, 250, 0.2);
+      box-shadow: 0 0 40px rgba(96, 165, 250, 0.7), inset 0 0 25px rgba(96, 165, 250, 0.3);
+      transform: translateY(-3px);
+      border-color: #93C5FD;
+      color: #0F2744;
+    }
+    .btn-back:hover svg { transform: translateX(-4px); }
+    .btn-back:active { transform: translateY(-1px) scale(0.98); }
+
+    /* home button – filled light blue */
+    .btn-home {
+      background: linear-gradient(135deg, #60A5FA, #2563EB);
+      color: #F0F9FF;
+      border: 2.5px solid transparent;
+      box-shadow: 0 8px 30px rgba(96, 165, 250, 0.7), 0 0 60px rgba(96, 165, 250, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-home::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(235, 245, 255, 0.6), transparent);
+      transform: rotate(45deg) translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    .btn-home:hover::before { transform: rotate(45deg) translateX(100%); }
+    .btn-home:hover {
+      background: linear-gradient(135deg, #93C5FD, #3B82F6);
+      box-shadow: 0 12px 40px rgba(96, 165, 250, 0.9), 0 0 90px rgba(125, 211, 252, 0.6);
+      transform: translateY(-3px) scale(1.03);
+      color: #E0F2FE;
+    }
+    .btn-home:hover svg { transform: scale(1.15); }
+    .btn-home:active { transform: translateY(-1px) scale(0.99); }
+
+    .divider {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(to right, transparent, #93C5FD, transparent);
+      margin: 20px auto 25px;
+      border-radius: 3px;
+      position: relative;
+    }
+    .divider::after {
+      content: '✧';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      background: var(--bg-soft);
+      padding: 0 10px;
+      color: #2563EB;
+      text-shadow: 0 0 12px rgba(125, 211, 252, 0.9);
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; text-shadow: 0 0 10px #3B82F6; }
+      50% { opacity: 0.7; text-shadow: 0 0 25px #7DD3FC; }
+    }
+
+    @media (max-width: 480px) {
+      .content-wrapper { padding: 20px 15px; }
+      .btn { padding: 12px 24px; font-size: 14px; width: 100%; justify-content: center; }
+      .button-group { flex-direction: column; gap: 12px; width: 100%; max-width: 280px; margin: 0 auto; }
+      .error-code { letter-spacing: -4px; }
+      .divider { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-animation">
+    <div class="grid-overlay"></div>
+    <div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div>
+    <div class="light-ray" style="--ray-angle: 15deg;"></div>
+    <div class="light-ray" style="--ray-angle: 25deg;"></div>
+    <div class="light-ray" style="--ray-angle: 5deg;"></div>
+    <div class="light-ray" style="--ray-angle: -10deg;"></div>
+    <div class="light-ray" style="--ray-angle: -20deg;"></div>
+    <div class="light-ray" style="--ray-angle: 12deg;"></div>
+    <div class="light-ray" style="--ray-angle: -8deg;"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="bg-shape shape-triangle"></div><div class="bg-shape shape-square"></div>
+    <div class="bg-shape shape-circle"></div><div class="bg-shape shape-diamond"></div>
+    <div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="error-glow"></div>
+    <h1 class="error-code">404</h1>
+    <div class="divider"></div>
+    <p class="error-message">Page Not Found</p>
+    <p class="error-description">
+      Oops! The page drifted into the open blue sky. Let’s guide you back to calmer waters.
+    </p>
+    <div class="button-group">
+      <button class="btn btn-back" onclick="goBack()" aria-label="Go back to previous page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Go Back
+      </button>
+      <a href="/" class="btn btn-home" aria-label="Go back to homepage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Back to Home
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      if (document.referrer && document.referrer !== window.location.href) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { goBack(); }
+    });
+
+    // gentle parallax for orbs – keeps blue theme interactive
+    document.addEventListener('mousemove', function(e) {
+      const orbs = document.querySelectorAll('.orb');
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      orbs.forEach((orb, index) => {
+        const depth = (index + 1) * 0.025;
+        const moveX = x * depth * 60;
+        const moveY = y * depth * 60;
+        orb.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
+      });
+    });
+  </script>
+</body>
+</html>
