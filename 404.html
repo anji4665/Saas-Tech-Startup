@@ -459,7 +459,7 @@
         </svg>
         Go Back
       </button>
-      <a href="/" class="btn btn-home" aria-label="Go back to homepage">
+      <a href="/" id="homeBtn" class="btn btn-home" aria-label="Go back to homepage">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
@@ -469,13 +469,46 @@
   </div>
 
   <script>
+    /* ===== SITE HOME =====
+       Leave as '' to auto-detect.
+       Force a value only if auto-detect fails:
+         GitHub Pages project site  -> '/your-repo-name/'
+         GitHub Pages user/org site -> '/'
+         Custom domain              -> '/'
+    */
+    const SITE_HOME_OVERRIDE = '';
+    let SITE_HOME = '/';
+
+    async function resolveHome(){
+      if (SITE_HOME_OVERRIDE) return SITE_HOME_OVERRIDE;
+
+      // On a project site the first path segment is the repo name.
+      const first = location.pathname.split('/').filter(Boolean)[0];
+      const candidates = first ? ['/' + first + '/', '/'] : ['/'];
+
+      for (const base of candidates){
+        try{
+          const res = await fetch(base + 'index.html', { method: 'HEAD', cache: 'no-store' });
+          if (res.ok) return base;
+        } catch(_){ /* ignore and try next */ }
+      }
+      return '/';
+    }
+
     function goBack() {
       if (document.referrer && document.referrer !== window.location.href) {
         window.history.back();
       } else {
-        window.location.href = '/';
+        window.location.href = SITE_HOME;
       }
     }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      SITE_HOME = await resolveHome();
+      const homeBtn = document.getElementById('homeBtn');
+      if (homeBtn) homeBtn.setAttribute('href', SITE_HOME);
+    });
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { goBack(); }
     });
@@ -487,9 +520,7 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 2;
       orbs.forEach((orb, index) => {
         const depth = (index + 1) * 0.025;
-        const moveX = x * depth * 60;
-        const moveY = y * depth * 60;
-        orb.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
+        orb.style.transform = `translate(${x * depth * 60}px, ${y * depth * 60}px) scale(1)`;
       });
     });
   </script>
