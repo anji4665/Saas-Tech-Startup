@@ -247,6 +247,13 @@
     padding:11px 13px; border-radius:9px; outline:none; transition: border-color .2s ease, box-shadow .2s ease;
   }
   .field input:focus, .field select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
+
+  /* full-width field (change password) */
+  .field-full{ grid-column: 1 / -1; }
+  .pw-row{ display:flex; gap:10px; align-items:stretch; }
+  .pw-row input{ flex:1 1 auto; min-width:0; margin:0; }
+  .pw-row .btn-secondary{ margin-top:0; flex:0 0 auto; }
+
   .btn-primary{
     border:none; border-radius:10px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: var(--ink); font-weight:700; font-size:13.5px; padding:11px 20px; cursor:pointer;
@@ -310,7 +317,6 @@
     .stat-grid{ grid-template-columns:1fr 1fr; gap:10px; }
     .stat-card{ padding:14px 14px 12px; }
     .stat-card .value{ font-size:20px; }
-    .settings-grid{ grid-template-columns:1fr; }
     .topbar-title{ font-size:13.5px; }
     thead{ display:none; }
     table, tbody, tr, td{ display:block; width:100%; }
@@ -320,6 +326,32 @@
     tbody td.cell-name-cell::before{ display:none; }
     .plan-card{ flex-wrap:wrap; }
     .toast{ left:14px; right:14px; top:14px; min-width:0; max-width:none; }
+
+    /* ---- Settings: every input the same size ---- */
+    .settings-grid{
+      grid-template-columns:1fr;
+      gap:14px;
+      max-width:none;
+      width:100%;
+    }
+    .field-full{ grid-column: auto; }
+
+    /* password row stacks: input full width, button full width below */
+    .pw-row{ flex-direction:column; gap:10px; }
+    .pw-row input,
+    .pw-row .btn-secondary{ width:100%; flex:0 0 auto; }
+
+    /* uniform height for every textbox / select / button in the form */
+    .field input,
+    .field select,
+    .pw-row input{
+      height:46px;
+      padding:0 14px;
+      font-size:15px;
+      line-height:normal;
+    }
+    .pw-row .btn-secondary{ height:46px; padding:0 14px; font-size:14px; }
+    .panel-body.pad .btn-primary{ width:100%; height:46px; padding:0 14px; font-size:14px; }
   }
 </style>
 </head>
@@ -517,10 +549,10 @@
                 <label>Notification email</label>
                 <input type="email" id="settingsNotifyEmail" placeholder="alerts@company.com" disabled>
               </div>
-              <div class="field" style="grid-column: span 2;">
+              <div class="field field-full">
                 <label>Change password</label>
-                <div style="display:flex; gap:10px;">
-                  <input type="password" id="settingsPassword" placeholder="New password" style="flex:1;">
+                <div class="pw-row">
+                  <input type="password" id="settingsPassword" placeholder="New password">
                   <button class="btn-secondary" onclick="changePassword()">Update</button>
                 </div>
               </div>
